@@ -1,3 +1,5 @@
+// EXERCISE 1: Adjust the vertex shader so that the triangle is upside down
+
 #version 330
 
 layout (location = 0) in vec3 aPos;
@@ -7,6 +9,6 @@ out vec3 ourColor;
 
 void main()
 {	
-	gl_Position = vec4(aPos, 1.0f);
+	gl_Position = vec4(aPos.x, aPos.y * -1.0f, aPos.z, 1.0f);
 	ourColor = aColor;
 }
