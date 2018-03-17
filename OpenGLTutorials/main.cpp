@@ -1,3 +1,5 @@
+// EXERCISE 2: Now create the same 2 triangles using two different VAOs and VBOs fo their data
+
 #include <iostream>
 
 #include <glad\glad.h>
@@ -93,50 +95,47 @@ int main()
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
-	float vertices[] =
-	{
-		 0.5f, 0.5f, 0.0f,	// TR
-		 0.5f, -0.5f, 0.0f,	// BR
-		-0.5f, -0.5f, 0.0f, // BL
-		-0.5f, 0.5f, 0.0f,	// TL
-	};
 
+
+	float firstTriangle[] = {
+		-0.9f, -0.5f, 0.0f,  // left 
+		-0.0f, -0.5f, 0.0f,  // right
+		-0.45f, 0.5f, 0.0f,  // top 
+	};
+	float secondTriangle[] = {
+		0.0f, -0.5f, 0.0f,  // left
+		0.9f, -0.5f, 0.0f,  // right
+		0.45f, 0.5f, 0.0f   // top 
+	};
 	
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
 
+	// Generate buffers
+	unsigned int VBO[2], VAO[2];
+	glGenVertexArrays(2, VAO);
+	glGenBuffers(2, VBO);
 
-	unsigned int VBO, VAO, EBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
+	// FIRST TRIANGLE
 
 	// 1º: Bind VAO
-	glBindVertexArray(VAO);
-
+	glBindVertexArray(VAO[0]);
 	// 2º: Copy vertices to VBO for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO); // Bind VBO
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	// 3º: Copy index array to EBO for OpenGL to use
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // Bind EBO
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// 4º: Set vertex attributes pointers
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]); // Bind VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+	// 3º: Set vertex attributes pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Unbind VBO is safe because glVertexAttribPointer registered VBO as the VAO's VBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-	// But DON'T unbind EBO while VAO is active
-	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	/// You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-	/// VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-	glBindVertexArray(0);
+	// SECOND TRIANGLE
+
+	// 1º: Bind VAO
+	glBindVertexArray(VAO[1]);
+	// 2º: Copy vertices to VBO for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+	// 3º: Set vertex attributes pointers
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 
 	while (!glfwWindowShouldClose(window))
@@ -149,19 +148,19 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO); // No need to bind it every time because we only have a single VAO
 
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		//glBindVertexArray(0); No need to unbind it every time
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	
+		glBindVertexArray(VAO[1]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	glDeleteVertexArrays(2, VAO);
+	glDeleteBuffers(2, VBO);
 
 	glfwTerminate();
 
