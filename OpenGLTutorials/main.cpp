@@ -102,14 +102,24 @@ int main()
 		// input
 		input(window);
 
+
 		// render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
+		shader.use();
+
+		float timeValue = glfwGetTime();
+		float xOffsetValue = sin(timeValue) / 2;
+		float yOffsetValue = cos(timeValue) / 2;
+		shader.set("xOffset", xOffsetValue);
+		shader.set("yOffset", yOffsetValue);
+
+
 		glBindVertexArray(VAO); // No need to bind it every time because we only have a single VAO
 
-		shader.use();
+
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
