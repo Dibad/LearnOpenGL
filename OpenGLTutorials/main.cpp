@@ -131,7 +131,7 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 
-	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("illuminati.png", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -147,6 +147,11 @@ int main()
 	shader.use();
 	shader.set("tex1", 0);
 	shader.set("tex2", 1);
+
+	// FIX WHITE BG AND TEXTURE ERRORS
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 	while (!glfwWindowShouldClose(window))
@@ -206,14 +211,16 @@ void input(GLFWwindow * window)
 	
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 	{
-		if (alphaMix < 1.0f);
-			alphaMix += 0.01f;
+		alphaMix += 0.02f;
+
+		if (alphaMix >= 1.0f) alphaMix = 1.0f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 	{
-		if (alphaMix > 0.0f)
-			alphaMix -= 0.01f;
+		alphaMix -= 0.02f;
+	
+		if (alphaMix <= 0.0f) alphaMix = 0.0f;
 	}
 
 }

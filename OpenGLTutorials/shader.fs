@@ -16,5 +16,5 @@ uniform float alphaValue;
 
 void main()
 {
-	FragColor = mix(texture(tex1, TexCoord), texture(tex2, TexCoord), texture(tex2, TexCoord).a * alphaValue);
+	FragColor = mix(texture(tex1, TexCoord).rgba, texture(tex2, TexCoord).rgba, alphaValue);
 }
