@@ -11,6 +11,8 @@
 void framebuffer_size_callback(GLFWwindow * window, int width, int height);
 void input(GLFWwindow * window);
 
+float alphaMix = 0.2f;
+
 int main()
 {
 	// GLFW Init and configure
@@ -161,6 +163,8 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture[1]);
 
+		shader.set("alphaValue", alphaMix);
+
 		shader.use();
 		glBindVertexArray(VAO); // No need to bind it every time because we only have a single VAO
 		
@@ -198,4 +202,18 @@ void input(GLFWwindow * window)
 
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		if (alphaMix < 1.0f);
+			alphaMix += 0.01f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		if (alphaMix > 0.0f)
+			alphaMix -= 0.01f;
+	}
+
 }
