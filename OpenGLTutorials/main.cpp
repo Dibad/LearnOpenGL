@@ -1,3 +1,8 @@
+// EXERCISE 2: Try drawing a second container with another call to
+// glDraw Elements but place it at a different position using transformations only.
+// Place it at the top-left of the window and scale it over time)
+
+
 #include <iostream>
 
 #include <glad\glad.h>
@@ -154,8 +159,6 @@ int main()
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-
-
 	while (!glfwWindowShouldClose(window))
 	{
 		// input
@@ -171,14 +174,20 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture[1]);
 
 		glm::mat4 trans(1.0f);
-		trans = glm::translate(trans, glm::vec3(std::sin(glfwGetTime()) / 2, std::cos(glfwGetTime()) / 2, 0.0f));
+		trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
 		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
 
 		shader.set("transform", trans);
 
-		shader.use();
 		glBindVertexArray(VAO); // No need to bind it every time because we only have a single VAO
-		
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		trans = glm::mat4(1.0f);
+		trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+		trans = glm::scale(trans, glm::vec3(sin((float)glfwGetTime()), sin((float)glfwGetTime()), 0.0f));
+
+		shader.set("transform", trans);
+
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwSwapBuffers(window);
