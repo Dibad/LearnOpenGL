@@ -3,6 +3,10 @@
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtc\type_ptr.hpp>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -150,6 +154,8 @@ int main()
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// input
@@ -163,6 +169,12 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture[0]);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture[1]);
+
+		glm::mat4 trans(1.0f);
+		trans = glm::translate(trans, glm::vec3(std::sin(glfwGetTime()) / 2, std::cos(glfwGetTime()) / 2, 0.0f));
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+
+		shader.set("transform", trans);
 
 		shader.use();
 		glBindVertexArray(VAO); // No need to bind it every time because we only have a single VAO
@@ -191,8 +203,6 @@ void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 
 void input(GLFWwindow * window)
 {
-	
-
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
