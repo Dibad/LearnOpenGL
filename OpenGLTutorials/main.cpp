@@ -1,3 +1,14 @@
+// EXERCISE 1: Using the last transformation on the container, try switching the order
+// around by first rotation and then translationg.
+// Why does this happens?
+// Answer:
+/*
+The matrix multiplication is applied in revers. Thus the translation
+is applied first to the container.
+As we now changed the origin with the translation, rotation will no
+longer be resolved around the rotation origin (0,0,0).
+*/
+
 #include <iostream>
 
 #include <glad\glad.h>
@@ -171,8 +182,9 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texture[1]);
 
 		glm::mat4 trans(1.0f);
-		trans = glm::translate(trans, glm::vec3(std::sin(glfwGetTime()) / 2, std::cos(glfwGetTime()) / 2, 0.0f));
+
 		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+		trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
 
 		shader.set("transform", trans);
 
