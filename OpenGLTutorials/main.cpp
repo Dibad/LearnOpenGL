@@ -1,3 +1,5 @@
+// EXERCISE 1: Try to move the light source around the scene over time.
+
 #include <iostream>
 
 #include <glad\glad.h>
@@ -183,6 +185,11 @@ int main()
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Change light position
+
+		lightPos.x = 1.0f + sin(currentFrame) * 2.0f;
+		lightPos.y = sin(currentFrame / 2.0f) * 1.0f;
 
 		// Shader
 		lightingshader.use();
