@@ -47,6 +47,8 @@ public:
 
 	float getZoom() const;
 
+	glm::vec3 getPosition() const;
+
 	// process Input
 
 	void processKeyboard(Movement direction, float deltaTime);

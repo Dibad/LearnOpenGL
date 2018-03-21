@@ -37,6 +37,11 @@ float Camera::getZoom() const
 }
 
 
+glm::vec3 Camera::getPosition() const
+{
+	return position_;
+}
+
 
 void Camera::processKeyboard(Movement direction, float deltaTime)
 {

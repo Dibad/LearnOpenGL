@@ -40,7 +40,9 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="learnopengl.fs" />
-    <None Include="learnopengl.vs" />
+    <None Include="shaders\container.fs" />
+    <None Include="shaders\container.vs" />
+    <None Include="shaders\light.fs" />
+    <None Include="shaders\light.vs" />
   </ItemGroup>
 </Project>
