@@ -14,9 +14,9 @@ class Shader
 {
 public:
 	
-	unsigned int ID;
+	GLuint ID;
 
-	Shader(const char * vertexPath, const char * fragmentPath);
+	Shader(const char * vertexPath, const char * fragmentPath, const char * geometryPath = nullptr);
 
 	void use();
 

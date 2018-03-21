@@ -24,6 +24,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
@@ -32,13 +35,12 @@
     <ClInclude Include="stb_image.h">
       <Filter>Archivos de origen</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.vs">
-      <Filter>Archivos de origen</Filter>
-    </None>
-    <None Include="shader.fs">
-      <Filter>Archivos de origen</Filter>
-    </None>
+    <None Include="learnopengl.fs" />
+    <None Include="learnopengl.vs" />
   </ItemGroup>
 </Project>
