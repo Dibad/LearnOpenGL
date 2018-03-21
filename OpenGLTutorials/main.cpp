@@ -38,7 +38,7 @@ float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f;
 
 // Lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(2.2f, 2.0f, 2.5f);
 
 
 int main()
@@ -139,6 +139,15 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] =
+	{
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(2.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 1.0f, 0.0f),
+		glm::vec3(1.0f, 0.0f, 1.0f)
+	};
+
 	GLuint VBO, cubeVAO;
 	glGenVertexArrays(1, &cubeVAO);
 	glGenBuffers(1, &VBO);
@@ -194,7 +203,7 @@ int main()
 
 		input(window);
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Shader
@@ -216,8 +225,8 @@ int main()
 
 		// World transformations
 		glm::mat4 model;
-		lightingshader.set("model", model);
 
+		// Texture setting
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
@@ -225,8 +234,17 @@ int main()
 
 		// Render cube
 		glBindVertexArray(cubeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+
+		for (unsigned int i = 0; i < NumOfElements(cubePositions); ++i)
+		{
+			model = glm::mat4();
+			model = glm::translate(model, cubePositions[i]);
+			model = glm::rotate(model, glm::radians(-25.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			lightingshader.set("model", model);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 		// Draw lamp object
 		lampShader.use();
