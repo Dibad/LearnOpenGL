@@ -1,3 +1,5 @@
+// EXERCISE 2: Do Phong shading in vew space instead of world space
+
 #include <iostream>
 
 #include <glad\glad.h>
