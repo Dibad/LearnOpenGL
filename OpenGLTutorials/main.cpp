@@ -1,3 +1,5 @@
+// EXERCISE 3: Implement Gourad shading instead of Phong shading
+
 #include <iostream>
 
 #include <glad\glad.h>
