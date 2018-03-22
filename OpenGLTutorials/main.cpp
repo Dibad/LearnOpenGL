@@ -190,10 +190,12 @@ int main()
 	// load Texture
 	GLuint diffuseMap = loadTexture("container2.png");
 	GLuint specularMap = loadTexture("container2_specular.png");
+	GLuint emissionMap = loadTexture("matrix.jpg");
 	// Set material properties
 	lightingShader.use();
 	lightingShader.set("material.diffuse", 0);
 	lightingShader.set("material.specular", 1);
+	lightingShader.set("material.emission", 2);
 	lightingShader.set("material.shininess", 64.0f);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -227,6 +229,7 @@ int main()
 		// Shader position
 		lightingShader.use();
 		lightingShader.set("viewPos", camera.getPosition());
+		lightingShader.set("time", currentFrame);
 
 		// directional light
 		lightingShader.set("dirLight.direction", -0.2f, -1.0f, -0.3f);
@@ -277,6 +280,9 @@ int main()
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, emissionMap);
 
 		// Render cube
 		glBindVertexArray(cubeVAO);

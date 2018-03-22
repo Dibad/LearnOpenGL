@@ -4,6 +4,7 @@ out vec4 FragColor;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+	sampler2D emission;
     float shininess;
 }; 
 
@@ -55,6 +56,7 @@ uniform SpotLight spotLight;
 uniform Material material;
 
 uniform bool on;
+uniform float time;
 
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -81,7 +83,18 @@ void main()
     // phase 3: spot light
     if(on)
 		result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
-    
+
+	if(texture(material.specular, TexCoords).r == 0.0f)
+	{
+		vec3 emission = texture(material.emission, TexCoords).rgb;
+
+		emission = texture(material.emission, TexCoords + vec2(0.0, time)).rgb;
+
+		emission *= sin(time) / 2.0f + 0.5f;
+
+		result += emission * vec3(2.0f, 0.0f, 0.0f);
+	}
+
     FragColor = vec4(result, 1.0);
 }
 
@@ -98,7 +111,8 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
-    return (ambient + diffuse + specular);
+    
+	return (ambient + diffuse + specular);
 }
 
 // calculates the color when using a point light.
