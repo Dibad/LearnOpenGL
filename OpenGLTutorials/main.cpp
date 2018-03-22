@@ -37,8 +37,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f;
 
-// Lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+bool on = true;
 
 
 int main()
@@ -90,7 +89,7 @@ int main()
 
 
 	// Build and compile Shader
-	Shader lightingshader("shaders/container.vs", "shaders/container.fs");
+	Shader lightingShader("shaders/container.vs", "shaders/container.fs");
 	Shader lampShader("shaders/light.vs", "shaders/light.fs");
 
 	// Set up vertex and buffer data and configure VAO
@@ -138,7 +137,7 @@ int main()
 		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
-
+	// positions of all containers
 	glm::vec3 cubePositions[] = {
 		glm::vec3(0.0f,  0.0f,  0.0f),
 		glm::vec3(2.0f,  5.0f, -15.0f),
@@ -151,6 +150,21 @@ int main()
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+	// positions of the point lights
+	glm::vec3 pointLightPositions[] = {
+		glm::vec3(0.7f,  0.2f,  2.0f),
+		glm::vec3(2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3(0.0f,  0.0f, -3.0f)
+	};
+
+	glm::vec3 pointLightColors[] = {
+		glm::vec3(0.1f, 0.1f, 0.1f),
+		glm::vec3(0.1f, 0.1f, 0.1f),
+		glm::vec3(0.1f, 0.1f, 0.1f),
+		glm::vec3(0.4f, 0.1f, 0.1f)
+	};
+
 
 	GLuint VBO, cubeVAO;
 	glGenVertexArrays(1, &cubeVAO);
@@ -177,10 +191,10 @@ int main()
 	GLuint diffuseMap = loadTexture("container2.png");
 	GLuint specularMap = loadTexture("container2_specular.png");
 	// Set material properties
-	lightingshader.use();
-	lightingshader.set("material.diffuse", 0);
-	lightingshader.set("material.specular", 1);
-	lightingshader.set("material.shininess", 64.0f);
+	lightingShader.use();
+	lightingShader.set("material.diffuse", 0);
+	lightingShader.set("material.specular", 1);
+	lightingShader.set("material.shininess", 64.0f);
 
 	///////////////////////////////////////////////////////////////////////////
 
@@ -207,32 +221,52 @@ int main()
 
 		input(window);
 
-		glClearColor(0.25f, 0.25f, 0.25f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Shader
-		lightingshader.use();
-		lightingshader.set("light.position", camera.getPosition());
-		lightingshader.set("light.direction", camera.getFront());
-		lightingshader.set("light.cutOff", glm::cos(glm::radians(12.5f)));
-		lightingshader.set("light.outercutOff", glm::cos(glm::radians(17.5f)));
+		// Shader position
+		lightingShader.use();
+		lightingShader.set("viewPos", camera.getPosition());
 
-		lightingshader.set("viewPos", camera.getPosition());
+		// directional light
+		lightingShader.set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+		lightingShader.set("dirLight.ambient", 0.0f, 0.0f, 0.0f);
+		lightingShader.set("dirLight.diffuse", 0.05f, 0.05f, 0.05f);
+		lightingShader.set("dirLight.specular", 0.05f, 0.05f, 0.05f);
 
-		// Set light properties
-		lightingshader.set("light.ambient", 0.1f, 0.1f, 0.1f);
-		lightingshader.set("light.diffuse", 0.8f, 0.8f, 0.8f); 
-		lightingshader.set("light.specular", 1.0f, 1.0f, 1.0f);
+		for (int i = 0; i < NumOfElements(pointLightPositions); ++i)
+		{
+			std::string buffer = "pointLights[" + std::to_string(i) + "].";
+			
+			lightingShader.set(buffer + "position", pointLightPositions[i]);
+			lightingShader.set(buffer + "ambient", pointLightColors[i] * 0.1f);
+			lightingShader.set(buffer + "diffuse", pointLightColors[i]);
+			lightingShader.set(buffer + "specular", pointLightColors[i]);
+			
+			lightingShader.set(buffer + "constant", 1.0f);
+			lightingShader.set(buffer + "linear", 0.14f);
+			lightingShader.set(buffer + "quadratic", 0.07f);
+		}
 
-		lightingshader.set("light.constant", 1.0f);
-		lightingshader.set("light.linear", 0.09f);
-		lightingshader.set("light.quadratic", 0.032f);
+		// spotLight
+		lightingShader.set("spotLight.position", camera.getPosition());
+		lightingShader.set("spotLight.direction", camera.getFront());
+		lightingShader.set("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+		lightingShader.set("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+		lightingShader.set("spotLight.specular", 1.0f, 1.0f, 1.0f);
+		lightingShader.set("spotLight.constant", 1.0f);
+		lightingShader.set("spotLight.linear", 0.09f);
+		lightingShader.set("spotLight.quadratic", 0.032f);
+		lightingShader.set("spotLight.cutOff", glm::cos(glm::radians(10.0f)));
+		lightingShader.set("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+
+		lightingShader.set("on", on);
 
 		// View/Projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.getViewMatrix();
-		lightingshader.set("projection", projection);
-		lightingshader.set("view", view);
+		lightingShader.set("projection", projection);
+		lightingShader.set("view", view);
 
 		// World transformations
 		glm::mat4 model;
@@ -247,14 +281,13 @@ int main()
 		// Render cube
 		glBindVertexArray(cubeVAO);
 
-
 		for (unsigned int i = 0; i < NumOfElements(cubePositions); ++i)
 		{
 			model = glm::mat4();
 			model = glm::translate(model, cubePositions[i]);
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			lightingshader.set("model", model);
+			lightingShader.set("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
@@ -263,13 +296,19 @@ int main()
 		lampShader.use();
 		lampShader.set("projection", projection);
 		lampShader.set("view", view);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lampShader.set("model", model);
 
 		glBindVertexArray(lightVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (unsigned int i = 0; i < NumOfElements(pointLightPositions); ++i)
+		{
+			lampShader.set("lightColor", pointLightColors[i]);
+
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, pointLightPositions[i]);
+			model = glm::scale(model, glm::vec3(0.2f));
+			lampShader.set("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 
 
 		////// SWAP /////
@@ -304,6 +343,12 @@ void input(GLFWwindow * window)
 		camera.processKeyboard(Movement::UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.processKeyboard(Movement::DOWN, deltaTime);
+
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+		on = true;
+
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE)
+		on = false;
 }
 
 
