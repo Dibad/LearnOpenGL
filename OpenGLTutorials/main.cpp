@@ -38,7 +38,7 @@ float deltaTime = 0.0f; // Time between current frame and last frame
 float lastFrame = 0.0f;
 
 // Lighting
-glm::vec3 lightPos(2.2f, 2.0f, 2.5f);
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 
 int main()
@@ -139,13 +139,17 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
-	glm::vec3 cubePositions[] =
-	{
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 1.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 1.0f)
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
 	GLuint VBO, cubeVAO;
@@ -208,14 +212,21 @@ int main()
 
 		// Shader
 		lightingshader.use();
-		lightingshader.set("light.position", lightPos);
+		lightingshader.set("light.position", camera.getPosition());
+		lightingshader.set("light.direction", camera.getFront());
+		lightingshader.set("light.cutOff", glm::cos(glm::radians(12.5f)));
+		lightingshader.set("light.outercutOff", glm::cos(glm::radians(17.5f)));
+
 		lightingshader.set("viewPos", camera.getPosition());
 
 		// Set light properties
-		lightingshader.set("light.ambient", 0.2f, 0.2f, 0.2f);
-		lightingshader.set("light.diffuse", 0.5f, 0.5f, 0.5f); 
+		lightingshader.set("light.ambient", 0.1f, 0.1f, 0.1f);
+		lightingshader.set("light.diffuse", 0.8f, 0.8f, 0.8f); 
 		lightingshader.set("light.specular", 1.0f, 1.0f, 1.0f);
 
+		lightingshader.set("light.constant", 1.0f);
+		lightingshader.set("light.linear", 0.09f);
+		lightingshader.set("light.quadratic", 0.032f);
 
 		// View/Projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -229,6 +240,7 @@ int main()
 		// Texture setting
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
 
@@ -240,9 +252,10 @@ int main()
 		{
 			model = glm::mat4();
 			model = glm::translate(model, cubePositions[i]);
-			model = glm::rotate(model, glm::radians(-25.0f * i), glm::vec3(0.0f, 1.0f, 0.0f));
-
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			lightingshader.set("model", model);
+
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
