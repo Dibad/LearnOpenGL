@@ -52,9 +52,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\container.fs" />
-    <None Include="shaders\container.vs" />
-    <None Include="shaders\light.fs" />
-    <None Include="shaders\light.vs" />
+    <None Include="shaders\mainShader.fs" />
+    <None Include="shaders\mainShader.vs" />
   </ItemGroup>
 </Project>

@@ -33,6 +33,8 @@ public:
 
 	void draw(const Shader & shader);
 
+	static GLuint textureFromFile(const char * path, const std::string & directory = " ", bool gamma = false);
+
 	void info() const;
 
 private:
@@ -41,7 +43,5 @@ private:
 	Mesh processMesh(aiMesh * mesh, const aiScene * scene);
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName);
-
-	static GLuint textureFromFile(const char * path, const std::string & directory, bool gamma = false);
 };
 
