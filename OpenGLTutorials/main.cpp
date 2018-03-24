@@ -62,8 +62,6 @@ int main()
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	//glDepthFunc(GL_ALWAYS);
-
 
 	double firstX, firstY;
 	glfwGetCursorPos(window, &firstX, &firstY);
