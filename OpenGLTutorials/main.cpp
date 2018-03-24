@@ -85,8 +85,36 @@ int main()
 	/////////////////////////////////////////////////////////////////////
 
 	Shader ourShader("shaders/container.vs", "shaders/container.fs");
+	Shader lampShader("shaders/light.vs", "shaders/light.fs");
 
-	Model ourModel("res/nanosuit/nanosuit.obj");
+	Model ourModel("res/2b/2b.obj");
+
+
+	ourShader.use();
+	ourShader.set("viewPos", camera.getPosition());
+	ourShader.set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+	ourShader.set("dirLight.ambient", 0.03f, 0.03f, 0.03f);
+	ourShader.set("dirLight.diffuse", 0.05f, 0.05f, 0.05f);
+	ourShader.set("dirLight.specular", 0.05f, 0.05f, 0.05f);
+
+	ourShader.set("pointLights[0].position", 0.0f, 5.0f, 5.0f);
+	ourShader.set("pointLights[0].ambient", 1.0f, 0.6f, 0.0f);
+	ourShader.set("pointLights[0].diffuse", 1.0f, 0.6f, 0.0f);
+	ourShader.set("pointLights[0].specular", 1.0f, 0.6f, 0.0f);
+	ourShader.set("pointLights[0].constant", 1.0f);
+	ourShader.set("pointLights[0].linear", 0.09f);
+	ourShader.set("pointLights[0].quadratic", 0.032f);
+
+
+	ourShader.set("pointLights[1].position", 3.0f, -2.0f, -4.0f);
+	ourShader.set("pointLights[1].ambient", 0.3f, 0.3f, 0.7f);
+	ourShader.set("pointLights[1].diffuse", 0.3f, 0.3f, 0.f);
+	ourShader.set("pointLights[1].specular", 0.3f, 0.3f, 0.7f);
+	ourShader.set("pointLights[1].constant", 1.0f);
+	ourShader.set("pointLights[1].linear", 0.09f);
+	ourShader.set("pointLights[1].quadratic", 0.032f);
+
+	ourModel.info();
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -110,11 +138,22 @@ int main()
 
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		model = glm::scale(model, glm::vec3(0.04f, 0.04f, 0.04f));
 		ourShader.set("model", model);
 
-
 		ourModel.draw(ourShader);
+
+		lampShader.use();
+		lampShader.set("projection", projection);
+		lampShader.set("view", view);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 5.0f, 5.0f));
+		model = glm::scale(model, glm::vec3(0.001f, 0.001f, 0.001f));
+		lampShader.set("model", model);
+		lampShader.set("lightColor", 1.0f, 0.6f, 0.0f);
+
+		ourModel.draw(lampShader);
 
 		////// SWAP /////
 		glfwSwapBuffers(window);

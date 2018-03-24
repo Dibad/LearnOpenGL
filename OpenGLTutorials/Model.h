@@ -33,6 +33,8 @@ public:
 
 	void draw(const Shader & shader);
 
+	void info() const;
+
 private:
 	void loadModel(const std::string & path);
 	void processNode(aiNode * node, const aiScene * scene);

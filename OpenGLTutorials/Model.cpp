@@ -202,3 +202,15 @@ GLuint Model::textureFromFile(const char * path, const std::string & directory, 
 
 	return textureID;
 }
+
+void Model::info() const
+{
+	std::cout << "Loaded textures:" << std::endl;
+	
+	for (auto & tex : textures_loaded_)
+	{
+		std::cout << "Texture " << tex.id << std::endl;
+		std::cout << " - Type: " << tex.type << std::endl;
+		std::cout << " - Path: " << tex.path << std::endl << std::endl;
+	}
+}
