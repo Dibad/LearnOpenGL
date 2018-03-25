@@ -54,5 +54,7 @@
   <ItemGroup>
     <None Include="shaders\mainShader.fs" />
     <None Include="shaders\mainShader.vs" />
+    <None Include="shaders\singleColor.fs" />
+    <None Include="shaders\singleColor.vs" />
   </ItemGroup>
 </Project>
