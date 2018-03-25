@@ -13,6 +13,8 @@
 #include "Model.h"
 
 #include <iostream>
+#include <vector>
+#include <map>
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -122,13 +124,17 @@ int main()
 	};
 	float planeVertices[] = {
 		// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-		5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
 		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f,
+		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f
+	};
 
-		5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-		5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+	float transparentVertices[] = {
+		0.0f,  0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f, 1.0f,
+		1.0f,  0.5f, 0.0f, 1.0f, 0.0f,
+		1.0f, -0.5f, 0.0f, 1.0f, 1.0f
 	};
 
 	///////////////////////
@@ -163,15 +169,47 @@ int main()
 
 	glBindVertexArray(0);
 
+	// Window VAO
+	GLuint transparentVAO, transparentVBO;
+	glGenVertexArrays(1, &transparentVAO);
+	glGenBuffers(1, &transparentVBO);
+	glBindVertexArray(transparentVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, transparentVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(transparentVertices), &transparentVertices, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	
+	glBindVertexArray(0);
+
 	////////////////////
 
 	GLuint cubeTexture = Model::textureFromFile("marble.jpg", "res");
 	GLuint floorTexture = Model::textureFromFile("metal.png", "res");
+	GLuint transparentTexture = Model::textureFromFile("transparent_window.png", "res", GL_CLAMP_TO_EDGE);
+
+	/////////////////////
+
+	std::vector<glm::vec3> windows
+	{
+		glm::vec3(-1.5f, 0.0f, -0.48f),
+		glm::vec3( 1.5f, 0.0f,  0.51f),
+		glm::vec3( 0.0f, 0.0f,  0.7f),
+		glm::vec3(-0.3f, 0.0f, -2.3f),
+		glm::vec3( 0.5f, 0.0f, -0.6f)
+	};
 
 	/////////////////////
 
 	shader.use();
 	shader.set("texture1", 0);
+
+	//////////////////////
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -180,6 +218,14 @@ int main()
 		lastFrame = currentFrame;
 
 		processInput(window);
+
+		// Sort transparent windows
+		std::map<float, glm::vec3> sorted;
+		for (unsigned i = 0; i < windows.size(); ++i)
+		{
+			float distance = glm::length(camera.getPosition() - windows[i]);
+			sorted[distance] = windows[i];
+		}
 
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -210,9 +256,22 @@ int main()
 		glBindVertexArray(planeVAO);
 		glBindTexture(GL_TEXTURE_2D, floorTexture);
 		shader.set("model", glm::mat4());
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glBindVertexArray(0);
 
+		
+		// Window
+		glBindVertexArray(transparentVAO);
+		glBindTexture(GL_TEXTURE_2D, transparentTexture);
+		for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+		{
+			model = glm::mat4(1.0f);
+			model = glm::translate(model, it->second);
+			shader.set("model", model);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
+		glBindVertexArray(0);
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
