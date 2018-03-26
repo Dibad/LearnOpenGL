@@ -70,99 +70,12 @@ int main()
 
 	//////////////////////////////////////
 
-	Shader shaderRed("shaders/globalShader.vs", "shaders/redShader.fs");
-	Shader shaderGreen("shaders/globalShader.vs", "shaders/greenShader.fs");
-	Shader shaderBlue("shaders/globalShader.vs", "shaders/blueShader.fs");
-	Shader shaderYellow("shaders/globalShader.vs", "shaders/yellowShader.fs");
+	Shader shader("shaders/globalShader.vs", "shaders/redShader.fs", "shaders/geometryShader.gs");
 
 	///////////////////////////////////////
-
-	float cubeVertices[] = {
-		// positions         
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f,  0.5f, -0.5f,
-		0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		0.5f, -0.5f,  0.5f,
-		0.5f,  0.5f,  0.5f,
-		0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		0.5f,  0.5f,  0.5f,
-		0.5f,  0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f,  0.5f,
-		0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f,  0.5f,
-		0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		0.5f,  0.5f, -0.5f,
-		0.5f,  0.5f,  0.5f,
-		0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-	};
-
-	///////////////////// Config vertex arrays
-
-	// Cube VAO
-	GLuint cubeVAO, cubeVBO;
-	glGenVertexArrays(1, &cubeVAO);
-	glGenBuffers(1, &cubeVBO);
-	glBindVertexArray(cubeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
 	
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	glBindVertexArray(0);
-
-
-	///////////////////// Config uniform buffer objects
-	GLuint uniformBlockIndexRed		= glGetUniformBlockIndex(shaderRed.getID(), "Matrices");
-	GLuint uniformBlockIndexGreen	= glGetUniformBlockIndex(shaderGreen.getID(), "Matrices");
-	GLuint uniformBlockIndexBlue	= glGetUniformBlockIndex(shaderBlue.getID(), "Matrices");
-	GLuint uniformBlockIndexYellow	= glGetUniformBlockIndex(shaderYellow.getID(), "Matrices");
-
-	glUniformBlockBinding(shaderRed.getID(),	uniformBlockIndexRed, 0);
-	glUniformBlockBinding(shaderGreen.getID(),	uniformBlockIndexGreen, 0);
-	glUniformBlockBinding(shaderBlue.getID(),	uniformBlockIndexBlue, 0);
-	glUniformBlockBinding(shaderYellow.getID(), uniformBlockIndexYellow, 0);
-
-	GLuint uboMatrices;
-	glGenBuffers(1, &uboMatrices);
-
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-	glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
-
-	glm::mat4 projection = glm::perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+	Model nanosuit("res/nanosuit/nanosuit.obj");
+	
 	//////////////////////
 
 	while (!glfwWindowShouldClose(window))
@@ -177,44 +90,23 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 1.0f, 100.0f);
 		glm::mat4 view = camera.getViewMatrix();
-		glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-		glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-		// Draw 4 cubes
-
-		glBindVertexArray(cubeVAO);
-		shaderRed.use();
 		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f));
-		shaderRed.set("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		shader.use();
+		shader.set("projection", projection);
+		shader.set("view", view);
+		shader.set("model", model);
 
-		shaderGreen.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f));
-		shaderGreen.set("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		shader.set("time", (float)glfwGetTime());
 
-		shaderBlue.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f));
-		shaderBlue.set("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		shaderYellow.use();
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f));
-		shaderYellow.set("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		nanosuit.draw(shader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
-	glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteBuffers(1, &cubeVBO);
 
 	glfwTerminate();
 

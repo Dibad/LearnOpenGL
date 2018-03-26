@@ -58,13 +58,10 @@
     <None Include="shaders\globalShader.vs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\greenShader.fs">
-      <Filter>Archivos de recursos</Filter>
-    </None>
     <None Include="shaders\redShader.fs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\yellowShader.fs">
+    <None Include="shaders\geometryShader.gs">
       <Filter>Archivos de recursos</Filter>
     </None>
   </ItemGroup>

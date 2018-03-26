@@ -142,10 +142,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\blueShader.fs" />
+    <None Include="shaders\geometryShader.gs" />
     <None Include="shaders\globalShader.vs" />
-    <None Include="shaders\greenShader.fs" />
     <None Include="shaders\redShader.fs" />
-    <None Include="shaders\yellowShader.fs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
