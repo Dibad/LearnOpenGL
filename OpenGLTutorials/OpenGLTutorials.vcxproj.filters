@@ -52,9 +52,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\mainShader.fs" />
-    <None Include="shaders\mainShader.vs" />
-    <None Include="shaders\screenShader.fs" />
-    <None Include="shaders\screenShader.vs" />
+    <None Include="shaders\skyboxShader.fs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\skyboxShader.vs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\mainShader.fs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\mainShader.vs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\screenShader.fs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\screenShader.vs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>
