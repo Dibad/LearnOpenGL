@@ -52,16 +52,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\blueShader.fs">
+    <None Include="shaders\default.fs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\globalShader.vs">
+    <None Include="shaders\normal.gs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\redShader.fs">
+    <None Include="shaders\normal.vs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\geometryShader.gs">
+    <None Include="shaders\normal.fs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\default.vs">
       <Filter>Archivos de recursos</Filter>
     </None>
   </ItemGroup>

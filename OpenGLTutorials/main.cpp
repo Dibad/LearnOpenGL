@@ -70,11 +70,14 @@ int main()
 
 	//////////////////////////////////////
 
-	Shader shader("shaders/globalShader.vs", "shaders/redShader.fs", "shaders/geometryShader.gs");
+	Shader shader("shaders/default.vs", "shaders/default.fs");
+	Shader normalShader("shaders/normal.vs", "shaders/normal.fs", "shaders/normal.gs");
 
 	///////////////////////////////////////
 	
 	Model nanosuit("res/nanosuit/nanosuit.obj");
+
+	glEnable(GL_CULL_FACE);
 	
 	//////////////////////
 
@@ -90,8 +93,7 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 1.0f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.2f, 100.0f);
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 model;
 		
@@ -103,6 +105,13 @@ int main()
 		shader.set("time", (float)glfwGetTime());
 
 		nanosuit.draw(shader);
+
+		normalShader.use();
+		normalShader.set("projection", projection);
+		normalShader.set("view", view);
+		normalShader.set("model", model);
+
+		nanosuit.draw(normalShader);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
