@@ -78,60 +78,51 @@ int main()
 	///////////////////////////////////////
 
 	float cubeVertices[] = {
-		// Back face
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // Bottom-left
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right
-		0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // bottom-right         
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // bottom-left
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
-		// Front face
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top-right
-		0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // top-right
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // top-left
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left
-		// Left face
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-right
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-left
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-left
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-left
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-right
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-right
-		// Right face
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-left
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-right
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right         
-		0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // bottom-right
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // top-left
-		0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-left     
-		// Bottom face
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // top-right
-		0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // top-left
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-left
-		0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // bottom-left
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // bottom-right
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // top-right
-		// Top face
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
-		0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // top-right     
-		0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // bottom-right
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // top-left
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f  // bottom-left        
-	};
+		// positions       
+		-0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f,  0.5f, -0.5f,
+		0.5f,  0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
 
-	float planeVertices[] = {
-		// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-		-5.0f, -0.5f,  5.0f, 0.0f, 0.0f,
-		 5.0f, -0.5f,  5.0f, 2.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f, 0.0f, 2.0f,
-		 5.0f, -0.5f, -5.0f, 2.0f, 2.0f
-	};
+		-0.5f, -0.5f,  0.5f,
+		0.5f, -0.5f,  0.5f,
+		0.5f,  0.5f,  0.5f,
+		0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
 
-	float quadVertices[] = {
-		// positions   // texCoords
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+
+		0.5f,  0.5f,  0.5f,
+		0.5f,  0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f,  0.5f,
+		0.5f,  0.5f,  0.5f,
+
+		-0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f,  0.5f,
+		0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+
+		-0.5f,  0.5f, -0.5f,
+		0.5f,  0.5f, -0.5f,
+		0.5f,  0.5f,  0.5f,
+		0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f
+	};
+	float quadVertices[] = {   // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+							   // positions   // texCoords
 		-1.0f,  1.0f,  0.0f, 1.0f,
 		-1.0f, -1.0f,  0.0f, 0.0f,
 		1.0f, -1.0f,  1.0f, 0.0f,
@@ -152,25 +143,8 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	
-	glBindVertexArray(0);
-
-	// Plane VAO
-	GLuint planeVAO, planeVBO;
-	glGenVertexArrays(1, &planeVAO);
-	glGenBuffers(1, &planeVBO);
-	glBindVertexArray(planeVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), &planeVertices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
 	glBindVertexArray(0);
 
 	// quad VAO
@@ -188,56 +162,54 @@ int main()
 
 	glBindVertexArray(0);
 
+	////////////////// Config framebuffers
+	
+	// configure MSAA framebuffer
+	// --------------------------
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// create a multisampled color attachment texture
+	unsigned int textureColorBufferMultiSampled;
+	glGenTextures(1, &textureColorBufferMultiSampled);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+	// create a (also multisampled) renderbuffer object for depth and stencil attachments
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	//////////////////// Load textures
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	GLuint cubeTexture = Model::textureFromFile("container.jpg", "res");
-	GLuint floorTexture = Model::textureFromFile("metal.png", "res");
+	// configure second post-processing framebuffer
+	unsigned int intermediateFBO;
+	glGenFramebuffers(1, &intermediateFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+	// create a color attachment texture
+	unsigned int screenTexture;
+	glGenTextures(1, &screenTexture);
+	glBindTexture(GL_TEXTURE_2D, screenTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);	// we only need a color buffer
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "ERROR::FRAMEBUFFER:: Intermediate framebuffer is not complete!" << std::endl;
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	///////////////////// Config shaders
-
-	shader.use();
-	shader.set("texture1", 0);
 
 	screenShader.use();
 	screenShader.set("screenTexture", 0);
 
-	////////////////// Config framebuffers
-	
-	GLuint framebuffer;
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// Create color attachment texture
-	GLuint texColorBuffer;
-	glGenTextures(1, &texColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-
-	// Create a renderbuffer object for depth and stencil attachment (won't sample these)
-	GLuint rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		std::cout << "ERROR::FRAMEBUFFER::Framebuffer is not complete!" << std::endl;
-		return -1;
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	////////////////////
-
-	glEnable(GL_CULL_FACE);
-	//glCullFace(GL_BACK);
-	//glFrontFace(GL_CW);
-
-	//////////////////////
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -247,53 +219,39 @@ int main()
 
 		processInput(window);
 
-		// Enable framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glEnable(GL_DEPTH_TEST);
-
 		// render
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.use();
-		glm::mat4 model(1.0f);
-		glm::mat4 view = camera.getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		shader.set("view", view);
-		shader.set("projection", projection);
+		// Enable framebuffer
+		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
 
-		// Render cubes
+		shader.use();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		shader.set("view", camera.getViewMatrix());
+		shader.set("projection", projection);
+		shader.set("model", glm::mat4());
 
 		glBindVertexArray(cubeVAO);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, cubeTexture);
-		model = glm::translate(model, glm::vec3(-1.0f, 0.001f, -1.0f));
-		shader.set("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(2.0f, 0.001f, 0.0f));
-		shader.set("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		
-		// Render floor
-
-		glBindVertexArray(planeVAO);
-		glBindTexture(GL_TEXTURE_2D, floorTexture);
-		shader.set("model", glm::mat4());
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glBindVertexArray(0);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+		glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		// Bind back to default framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDisable(GL_DEPTH_TEST);
-		// Clear all buffers
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
 
 		screenShader.use();
 		glBindVertexArray(quadVAO);
-		glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, screenTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		glfwSwapBuffers(window);
@@ -301,10 +259,9 @@ int main()
 	}
 
 	glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteVertexArrays(1, &planeVAO);
 	glDeleteBuffers(1, &cubeVBO);
-	glDeleteBuffers(1, &planeVBO);
 	glDeleteFramebuffers(1, &framebuffer);
+	glDeleteFramebuffers(1, &intermediateFBO);
 
 	glfwTerminate();
 
