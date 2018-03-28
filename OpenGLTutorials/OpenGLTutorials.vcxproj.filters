@@ -55,15 +55,6 @@
     <None Include="shaders\default.fs">
       <Filter>Archivos de recursos</Filter>
     </None>
-    <None Include="shaders\normal.gs">
-      <Filter>Archivos de recursos</Filter>
-    </None>
-    <None Include="shaders\normal.vs">
-      <Filter>Archivos de recursos</Filter>
-    </None>
-    <None Include="shaders\normal.fs">
-      <Filter>Archivos de recursos</Filter>
-    </None>
     <None Include="shaders\default.vs">
       <Filter>Archivos de recursos</Filter>
     </None>
