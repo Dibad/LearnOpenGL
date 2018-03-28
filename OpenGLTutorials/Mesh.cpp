@@ -10,6 +10,12 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vecto
 }
 
 
+GLuint Mesh::getVAO() const
+{
+	return VAO_;
+}
+
+
 void Mesh::draw(const Shader & shader)
 {
 	GLuint diffuseNr = 1;

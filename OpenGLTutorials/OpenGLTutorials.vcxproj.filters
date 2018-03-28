@@ -52,11 +52,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\default.fs">
-      <Filter>Archivos de recursos</Filter>
+    <None Include="shaders\planet.fs">
+      <Filter>Archivos de origen</Filter>
     </None>
-    <None Include="shaders\default.vs">
-      <Filter>Archivos de recursos</Filter>
+    <None Include="shaders\planet.vs">
+      <Filter>Archivos de origen</Filter>
     </None>
+    <None Include="shaders\asteroid.fs">
+      <Filter>Archivos de origen</Filter>
+    </None>
+    <None Include="shaders\asteroid.vs">
+      <Filter>Archivos de origen</Filter>
+    </None>
+    <None Include="shaders\skybox.fs" />
+    <None Include="shaders\skybox.vs" />
   </ItemGroup>
 </Project>

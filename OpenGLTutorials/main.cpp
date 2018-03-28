@@ -19,7 +19,7 @@
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(10.0f, 5.0f, 3.0f));
 float lastX = (float)SCR_WIDTH / 2.0f;
 float lastY = (float)SCR_HEIGHT / 2.0f;
 
@@ -30,6 +30,7 @@ float lastFrame = 0.0f;
 void framebuffer_size_callback(GLFWwindow * window, int width, int height);
 void mouse_callback(GLFWwindow * window, double xpos, double ypos);
 void processInput(GLFWwindow * window);
+GLuint loadCubemap(std::vector<std::string> faces);
 
 
 int main()
@@ -72,19 +73,96 @@ int main()
 
 	//////////////////////////////////////
 
-	Shader shader("shaders/default.vs", "shaders/default.fs");
+	Shader shader("shaders/asteroid.vs", "shaders/asteroid.fs");
+	Shader planetShader("shaders/planet.vs", "shaders/planet.fs");
+	Shader skyboxShader("shaders/skybox.vs", "shaders/skybox.fs");
 
 	Model rock("res/rock/rock.obj");
 	Model planet("res/planet/planet.obj");
 
 	///////////////////////////////////////
-	
-	unsigned int amount = 1000;
+
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+	//////////////////////
+
+	GLuint skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glBindVertexArray(0);
+
+	///////////////////////
+
+	std::vector<std::string> faces
+	{
+		"res/skybox/blue/bkg1_right.png",
+		"res/skybox/blue/bkg1_left.png",
+		"res/skybox/blue/bkg1_top.png",
+		"res/skybox/blue/bkg1_bot.png",
+		"res/skybox/blue/bkg1_front.png",
+		"res/skybox/blue/bkg1_back.png"
+	};
+
+	GLuint cubeMapTexture = loadCubemap(faces);
+
+	///////////////////////
+
+	unsigned int amount = 50000;
 	glm::mat4 * modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime());
-	float radius = 50.0f;
-	float offset = 2.5f;
+	float radius = 150.0f;
+	float offset = 40.0f;
 	for (unsigned int i = 0; i < amount; ++i)
 	{
 		glm::mat4 model;
@@ -110,6 +188,39 @@ int main()
 	}
 
 	///////////////////////////////////////
+
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+	for (unsigned int i = 0; i < rock.meshes_.size(); ++i)
+	{
+		GLuint VAO = rock.meshes_[i].getVAO();
+		glBindVertexArray(VAO);
+
+		GLsizei vec4Size = sizeof(glm::vec4);
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(vec4Size));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+	}
+
+	skyboxShader.use();
+	skyboxShader.set("skybox", 0);
+
+	///////////////////////////////////////
 	
 	while (!glfwWindowShouldClose(window))
 	{
@@ -126,25 +237,39 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
 		glm::mat4 view = camera.getViewMatrix();
 		
-		shader.use();
-		shader.set("projection", projection);
-		shader.set("view", view);
+		planetShader.use();
+		planetShader.set("projection", projection);
+		planetShader.set("view", view);
 
 		// Draw planet
 
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(4.0f, 4.0f, 4.0f));
-		shader.set("model", model);
+		model = glm::scale(model, glm::vec3(15.0f, 15.0f, 15.0f));
+		planetShader.set("model", model);
 		planet.draw(shader);
 
+		shader.use();
+		shader.set("texture_diffuse1", 0);
+		shader.set("projection", projection);
+		shader.set("view", view);
 		// Draw meteorites
-		for (unsigned int i = 0; i < amount; ++i)
+		for (unsigned int i = 0; i < rock.meshes_.size(); ++i)
 		{
-			shader.set("model", modelMatrices[i]);
-			rock.draw(shader);
+			glBindVertexArray(rock.meshes_[i].getVAO());
+			glDrawElementsInstanced(GL_TRIANGLES, rock.meshes_[i].indices_.size(), GL_UNSIGNED_INT, 0, amount);
 		}
 
+		glDepthFunc(GL_LEQUAL);
+		skyboxShader.use();
+		skyboxShader.set("view", glm::mat4(glm::mat3(camera.getViewMatrix())));
+		skyboxShader.set("projection", projection);
+
+		glBindVertexArray(skyboxVAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -185,6 +310,36 @@ void processInput(GLFWwindow * window)
 }
 
 
+GLuint loadCubemap(std::vector<std::string> faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (size_t i = 0; i < faces.size(); ++i)
+	{
+		unsigned char * data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		}
+		else
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+
+		stbi_image_free(data);
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+
 void framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -201,3 +356,4 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 
 	camera.processMouseMovement(xoffset, yoffset);
 }
+

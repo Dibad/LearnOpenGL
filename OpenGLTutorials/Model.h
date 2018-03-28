@@ -21,7 +21,6 @@
 class Model
 {
 private:
-	std::vector<Mesh> meshes_;
 	std::string directory_;
 
 	std::vector<Texture> textures_loaded_;
@@ -29,6 +28,8 @@ private:
 	bool gammaCorrection;
 
 public:
+	std::vector<Mesh> meshes_;
+
 	Model(const std::string & path, bool gamma = false);
 
 	void draw(const Shader & shader);

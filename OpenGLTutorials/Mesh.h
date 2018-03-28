@@ -38,11 +38,14 @@ private:
 	GLuint VAO_, VBO_, EBO_;
 
 	std::vector<Vertex> vertices_;
-	std::vector<GLuint> indices_;
 	std::vector<Texture> textures_;
 
 public:
+	std::vector<GLuint> indices_;
+
 	Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+
+	GLuint getVAO() const;
 
 	void draw(const Shader & shader);
 
