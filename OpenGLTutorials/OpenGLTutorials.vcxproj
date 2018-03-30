@@ -143,6 +143,8 @@
   <ItemGroup>
     <None Include="shaders\mainShader.fs" />
     <None Include="shaders\mainShader.vs" />
+    <None Include="shaders\quad.fs" />
+    <None Include="shaders\quad.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
