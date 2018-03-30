@@ -47,6 +47,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GL_MULTISAMPLE, 4);
 
 	GLFWwindow * window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Advanced OpenGL", nullptr, nullptr);
 	if (window == nullptr)
@@ -72,6 +73,7 @@ int main()
 	}
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	double firstX, firstY;
 	glfwGetCursorPos(window, &firstX, &firstY);
@@ -80,20 +82,21 @@ int main()
 
 	/////////////////////// Shaders setup
 
-	Shader simpleDepthShader("shaders/mainShader.vs", "shaders/mainShader.fs");
+	Shader shader("shaders/mainShader.vs", "shaders/mainShader.fs");
+	Shader simpleDepthShader("shaders/depth.vs", "shaders/depth.fs");
 	Shader debugDepthQuad("shaders/quad.vs", "shaders/quad.fs");
 
 	/////////////////////// Vertices
-	float planeVertices[] = {
-		// positions            // normals         // texcoords
-		25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-		-25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-		-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+    float planeVertices[] = {
+        // positions            // normals         // texcoords
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
 
-		25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-		-25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-		25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 10.0f
-	};
+         25.0f, -0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+         25.0f, -0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+    };
 
 	/////////////////////// VAO and VBO
 
@@ -123,8 +126,10 @@ int main()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bordercolor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -137,6 +142,10 @@ int main()
 	GLuint woodTexture = Model::textureFromFile("wood.png", "res");
 
 	/////////////////////// Shader configuration
+
+	shader.use();
+	shader.set("diffuseTexture", 0);
+	shader.set("shadowMap", 1);
 
 	debugDepthQuad.use();
 	debugDepthQuad.set("depthMap", 0);
@@ -175,11 +184,32 @@ int main()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		glCullFace(GL_FRONT);
 		renderScene(simpleDepthShader);
+		glCullFace(GL_BACK);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 2. Render scene as normal using the generated depth/shadow map
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shader.use();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		glm::mat4 view = camera.getViewMatrix();
+		shader.set("projection", projection);
+		shader.set("view", view);
+
+		shader.set("viewPos", camera.getPosition());
+		shader.set("lightPos", lightPos);
+		shader.set("lightSpaceMatrix", lightSpaceMatrix);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		renderScene(shader);
 
 		// Render depth map to quad for visual debugging
 
@@ -188,7 +218,7 @@ int main()
 		debugDepthQuad.set("far_plane", far_plane);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, depthMap);
-		renderQuad();
+		//renderQuad();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -314,10 +344,10 @@ void renderQuad()
 	{
 		float quadVertices[] = {
 			// positions        // texture Coords
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			0.5f,  1.0f, 0.0f, 0.0f, 1.0f,
+			0.5f,  0.5f, 0.0f, 0.0f, 0.0f,
 			1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+			1.0f, 0.5f, 0.0f,  1.0f, 0.0f,
 		};
 		// setup plane VAO
 		glGenVertexArrays(1, &quadVAO);
@@ -344,18 +374,20 @@ void processInput(GLFWwindow * window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
+
+	float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(Movement::FORWARD, deltaTime);
+		camera.processKeyboard(Movement::FORWARD, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(Movement::BACKWARD, deltaTime);
+		camera.processKeyboard(Movement::BACKWARD, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(Movement::LEFT, deltaTime);
+		camera.processKeyboard(Movement::LEFT, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(Movement::RIGHT, deltaTime);
+		camera.processKeyboard(Movement::RIGHT, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		camera.processKeyboard(Movement::UP, deltaTime);
+		camera.processKeyboard(Movement::UP, cameraSpeed);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.processKeyboard(Movement::DOWN, deltaTime);
+		camera.processKeyboard(Movement::DOWN, cameraSpeed);
 }
 
 

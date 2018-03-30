@@ -60,5 +60,11 @@
     <None Include="shaders\quad.vs">
       <Filter>Archivos de recursos</Filter>
     </None>
+    <None Include="shaders\depth.fs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
+    <None Include="shaders\depth.vs">
+      <Filter>Archivos de recursos</Filter>
+    </None>
   </ItemGroup>
 </Project>
