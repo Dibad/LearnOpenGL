@@ -33,7 +33,7 @@ public:
 
 	void draw(const Shader & shader);
 
-	static GLuint textureFromFile(const char * path, const std::string & directory = ".", GLint param = GL_REPEAT, bool gamma = false);
+	static GLuint textureFromFile(const char * path, const std::string & directory = ".", bool gamma = false, GLint param = GL_REPEAT);
 
 	void info() const;
 

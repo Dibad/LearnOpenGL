@@ -16,8 +16,8 @@
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
-bool blinn = false;
-bool blinnKeyPressed = false;
+bool gammaEnabled = true;
+bool gammaKeyPressed = false;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = (float)SCR_WIDTH / 2.0f;
@@ -107,7 +107,8 @@ int main()
 
 	/////////////////////// Textures
 
-	GLuint floorTexture = Model::textureFromFile("wood.png", "res");
+	GLuint floorTexture = Model::textureFromFile("wood.png", "res", false);
+	GLuint floorTextureGammaCorrected = Model::textureFromFile("wood.png", "res", true);
 
 	/////////////////////// Shader configuration
 
@@ -116,8 +117,18 @@ int main()
 
 	/////////////////////// Light configuration
 
-	glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-
+	glm::vec3 lightPositions[] = {
+		glm::vec3(-3.0f, 0.0f, 0.0f),
+		glm::vec3(-1.0f, 0.0f, 0.0f),
+		glm::vec3(1.0f, 0.0f, 0.0f),
+		glm::vec3(3.0f, 0.0f, 0.0f)
+	};
+	glm::vec3 lightColors[] = {
+		glm::vec3(0.25),
+		glm::vec3(0.50),
+		glm::vec3(0.75),
+		glm::vec3(1.00)
+	};
 
 	/////////////////////// Main loop
 
@@ -138,15 +149,15 @@ int main()
 		shader.set("view", view);
 		shader.set("projection", projection);
 
+		glUniform3fv(glGetUniformLocation(shader.getID(), "lightPositions"), 4, &lightPositions[0][0]);
+		glUniform3fv(glGetUniformLocation(shader.getID(), "lightColors"), 4, &lightColors[0][0]);
 		shader.set("viewPos", camera.getPosition());
-		shader.set("lightPos", lightPos);
-		shader.set("blinn", blinn);
-
+		shader.set("gamma", gammaEnabled);
 		// Render floor
 
 		glBindVertexArray(planeVAO);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, floorTexture);
+		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? floorTextureGammaCorrected : floorTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
@@ -184,16 +195,16 @@ void processInput(GLFWwindow * window)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.processKeyboard(Movement::DOWN, deltaTime);
 
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed)
+	if ((glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) && !gammaKeyPressed)
 	{
-		blinn = !blinn;
-		blinnKeyPressed = true;
+		gammaEnabled = !gammaEnabled;
+		gammaKeyPressed = true;
 
-		std::cout << (blinn ? "Blinn-Phong" : "Phong") << std::endl;
+		std::cout << (gammaEnabled ? "Gamma enabled" : "Gamma disabled") << std::endl;
 	}
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE)
 	{
-		blinnKeyPressed = false;
+		gammaKeyPressed = false;
 	}
 }
 
