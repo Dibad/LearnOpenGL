@@ -16,8 +16,8 @@
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
-bool gammaEnabled = true;
-bool gammaKeyPressed = false;
+bool normal = true;
+bool normalKeyPressed = false;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = (float)SCR_WIDTH / 2.0f;
@@ -107,13 +107,14 @@ int main()
 
 	/////////////////////// Textures
 
-	GLuint floorTexture = Model::textureFromFile("wood.png", "res", false);
-	GLuint floorTextureGammaCorrected = Model::textureFromFile("wood.png", "res", true);
+	GLuint wallTexture = Model::textureFromFile("brickwall.jpg", "res", false);
+	GLuint wallTexture_normal = Model::textureFromFile("brickwall_normal.jpg", "res", false);
 
 	/////////////////////// Shader configuration
 
 	shader.use();
-	shader.set("floorTexture", 0);
+	shader.set("wallTexture", 0);
+	shader.set("wallTexture_normal", 1);
 
 	/////////////////////// Light configuration
 
@@ -148,16 +149,18 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		shader.set("view", view);
 		shader.set("projection", projection);
+		shader.set("show_normal", normal);
 
 		glUniform3fv(glGetUniformLocation(shader.getID(), "lightPositions"), 4, &lightPositions[0][0]);
 		glUniform3fv(glGetUniformLocation(shader.getID(), "lightColors"), 4, &lightColors[0][0]);
 		shader.set("viewPos", camera.getPosition());
-		shader.set("gamma", gammaEnabled);
 		// Render floor
 
 		glBindVertexArray(planeVAO);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gammaEnabled ? floorTextureGammaCorrected : floorTexture);
+		glBindTexture(GL_TEXTURE_2D, wallTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, wallTexture_normal);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
@@ -195,16 +198,16 @@ void processInput(GLFWwindow * window)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.processKeyboard(Movement::DOWN, deltaTime);
 
-	if ((glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS) && !gammaKeyPressed)
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !normalKeyPressed)
 	{
-		gammaEnabled = !gammaEnabled;
-		gammaKeyPressed = true;
-
-		std::cout << (gammaEnabled ? "Gamma enabled" : "Gamma disabled") << std::endl;
+		normal = !normal;
+		std::cout << ((normal) ? "Normal on" : "Normal off") << std::endl;
+		normalKeyPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_RELEASE)
+
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE)
 	{
-		gammaKeyPressed = false;
+		normalKeyPressed = false;
 	}
 }
 
