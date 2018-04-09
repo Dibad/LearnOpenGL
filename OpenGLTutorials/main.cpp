@@ -16,8 +16,9 @@
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
-bool normal = true;
-bool normalKeyPressed = false;
+bool parallax = true;
+bool parallaxKeyPressed = false;
+float heightScale = 0.1f;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = (float)SCR_WIDTH / 2.0f;
@@ -81,18 +82,20 @@ int main()
 
 	/////////////////////// Textures
 
-	GLuint diffuseMap = Model::textureFromFile("brickwall.jpg", "res");
-	GLuint normalMap = Model::textureFromFile("brickwall_normal.jpg", "res");
+	GLuint diffuseMap = Model::textureFromFile("bricks2.jpg", "res");
+	GLuint normalMap = Model::textureFromFile("bricks2_normal.jpg", "res");
+	GLuint heightMap = Model::textureFromFile("bricks2_disp.jpg", "res");
 
 	/////////////////////// Shader configuration
 
 	shader.use();
 	shader.set("diffuseMap", 0);
 	shader.set("normalMap", 1);
+	shader.set("depthMap", 2);
 
 	/////////////////////// Light configuration
 
-	glm::vec3 lightPos(0.0f, 1.0f, 0.7f);
+	glm::vec3 lightPos(0.3f, 0.7f, 1.0f);
 
 	/////////////////////// Main loop
 
@@ -114,17 +117,21 @@ int main()
 		shader.set("projection", projection);
 		shader.set("view", view);
 
-		shader.set("show_normal", normal);
+		shader.set("show_parallax", parallax);
 
 		glm::mat4 model;
 		model = glm::rotate(model, glm::radians(0.0f), glm::normalize(glm::vec3(1.0f, 0.0f, 1.0f)));
 		shader.set("model", model);
 		shader.set("viewPos", camera.getPosition());
 		shader.set("lightPos", lightPos);
+		shader.set("heightScale", heightScale);
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, normalMap);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, heightMap);
 		renderQuad();
 
 		model = glm::mat4();
@@ -260,16 +267,36 @@ void processInput(GLFWwindow * window)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.processKeyboard(Movement::DOWN, deltaTime);
 
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !normalKeyPressed)
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && !parallaxKeyPressed)
 	{
-		normal = !normal;
-		std::cout << ((normal) ? "Normal on" : "Normal off") << std::endl;
-		normalKeyPressed = true;
+		parallax = !parallax;
+		std::cout << ((parallax) ? "Parallax on" : "Parallax off") << std::endl;
+		parallaxKeyPressed = true;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_RELEASE)
 	{
-		normalKeyPressed = false;
+		parallaxKeyPressed = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		if (heightScale > 0.0f)
+			heightScale -= 0.003;
+		else
+			heightScale = 0.0f;
+
+		std::cout << heightScale << std::endl;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		if (heightScale < 1.0f)
+			heightScale += 0.003f;
+		else
+			heightScale = 1.0f;
+
+		std::cout << heightScale << std::endl;
 	}
 }
 

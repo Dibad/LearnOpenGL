@@ -7,67 +7,102 @@ in VS_OUT {
     vec3 TangentLightPos;
     vec3 TangentViewPos;
     vec3 TangentFragPos;
-	vec3 Normal;
 } fs_in;
 
 uniform sampler2D diffuseMap;
 uniform sampler2D normalMap;
+uniform sampler2D depthMap;
 
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+uniform float heightScale;
 
-uniform bool show_normal;
+uniform bool show_parallax;
+
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{ 
+    const float minLayers = 8;
+    const float maxLayers = 32;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));  
+
+	float layerDepth = 1.0f / numLayers;
+
+	float currentLayerDepth = 0.0f;
+
+    vec2 P = viewDir.xy / viewDir.z * heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+ 
+	vec2 currentTexCoords = texCoords;
+	float currentDepthMapValue = texture(depthMap, currentTexCoords).r;
+
+	while(currentLayerDepth < currentDepthMapValue)
+	{
+		currentTexCoords -= deltaTexCoords;
+
+		currentDepthMapValue = texture(depthMap, currentTexCoords).r;
+		currentLayerDepth += layerDepth;
+	}
+
+    // get texture coordinates before collision (reverse operations)
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+
+    // get depth after and before collision for linear interpolation
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(depthMap, prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+    // interpolation of texture coordinates
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
 
 vec3 BlinnPhong(vec3 normal, vec3 fragPos, vec3 lightPos, vec3 lightColor)
 {
-	// Ambient
+  // ambient
+    vec3 ambient = 0.1 * lightColor;
+    // diffuse
+    vec3 lightDir = normalize(lightPos - fragPos);
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * lightColor;
+    // specular    
+    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 halfwayDir = normalize(lightDir + normalize(lightPos - fragPos));  
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
 
-	// diffuse
-	vec3 lightDir = normalize(lightPos - fragPos);
-	float diff = max(dot(lightDir, normal), 0.0f);
-	vec3 diffuse = diff * lightColor;
-	// specular
-	vec3 viewDir = normalize(viewPos - fragPos);
-	vec3 reflectDir = reflect(-lightDir, normal);
-	vec3 halfwayDir = normalize(lightDir + viewDir);
-	float spec = pow(max(dot(normal,halfwayDir), 0.0f), 32.0f);
-	vec3 specular = spec * lightColor;
+    vec3 specular = vec3(0.2) * spec;
 
-	// Attenuation
 	float max_distance = 1.5f;
 	float distance = length(lightPos - fragPos);
 	float attenuation = 1.0f / distance;
 
+	ambient *= attenuation;
 	diffuse *= attenuation;
 	specular *= attenuation;
 
-	return diffuse + specular;
+	return ambient + diffuse + specular;
 }
 
 void main()
 {           
-	vec3 color = texture(diffuseMap, fs_in.TexCoords).rgb;
-	vec3 lighting = vec3(0.0f);
-	vec3 normal;
-
-	vec3 lightColor = vec3(1.0f);
-
-	if(show_normal)
+    // offset texture coordinates with Parallax Mapping
+    vec3 viewDir = normalize(fs_in.TangentViewPos - fs_in.TangentFragPos);
+    vec2 texCoords = fs_in.TexCoords;
+    
+	if(show_parallax)
 	{
-		// obtain normal from normal map in range [0,1]
-		normal = texture(normalMap, fs_in.TexCoords).rgb;
-		// transform normal vector to range [-1,1]
-		normal = normalize(normal * 2.0 - 1.0);  // this normal is in tangent space
-		lighting += BlinnPhong(normal, fs_in.TangentFragPos, fs_in.TangentLightPos, lightColor);
-	}
-	else
-	{
-		normal = normalize(fs_in.Normal);
-		lighting += BlinnPhong(normal, fs_in.FragPos, lightPos, lightColor);
+	    texCoords = ParallaxMapping(fs_in.TexCoords,  viewDir);       
+		if(texCoords.x > 1.0 || texCoords.y > 1.0 || texCoords.x < 0.0 || texCoords.y < 0.0)
+			discard;
 	}
 
-	color *= lighting;
 
-	FragColor = vec4(color, 1.0f);
+    // obtain normal from normal map
+    vec3 normal = texture(normalMap, texCoords).rgb;
+    normal = normalize(normal * 2.0 - 1.0);   
+   
+    // get diffuse color
+    vec3 color = texture(diffuseMap, texCoords).rgb;
+  
+	color *= BlinnPhong(normal, fs_in.TangentFragPos, fs_in.TangentLightPos, vec3(1.0f));
 
+    FragColor = vec4(color, 1.0);
 }
